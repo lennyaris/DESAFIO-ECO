@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <title>Contador de Vueltas</title>
+</head>
+<body>
+    <div class="container">
+        <div class="formulario">
+            <label for="numeroChapa">Número de Chapa:</label>
+            <input type="text" id="numeroChapa">
+            <button onclick="iniciarContador()">Iniciar Contador</button>
+            <button onclick="registrarVuelta()">Registrar Vuelta</button>
+
+            <p>Preview del tiempo de vuelta: <span id="tiempoVueltaPreview">0h 0m 0s</span></p>
+        </div>
+
+        <div class="tabla">
+            <table>
+                <thead>
+                    <tr>
+                        <th>N CHAPA</th>
+                        <th>Tiempo de Vuelta</th>
+                        <th>Número de Vuelta</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaVueltas">
+                    <!-- Las filas de la tabla se agregan dinámicamente mediante JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
+
+
