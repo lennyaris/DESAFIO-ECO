@@ -26,6 +26,7 @@
 
         #tiempo, #capacidadTotal, #capacidadRestante {
             margin-bottom: 10px;
+            text-align: center;
         }
 
         input[type="time"],
@@ -91,6 +92,11 @@
 
         #enterButton{
             margin: 20px;
+            font-size: 25px;
+            border-radius: 5px;
+            background-color: #9c9999;
+            border-color: #727272;
+            border-width: 5px;
 
         }
 
@@ -101,7 +107,7 @@
 
     th, td {
         text-align: center;
-        padding: 8px;
+        padding: 12px; /* Aumenta el espacio interno de celdas */
         border: 1px solid #ddd;
     }
 
@@ -112,6 +118,7 @@
     th {
         background-color: #727272;
         color: white;
+        font-size: 18px; /* Aumenta el tamaño de fuente del encabezado */
     }
     </style>
 </head>
@@ -136,18 +143,19 @@
             <p id="resultado" style="display: none;"></p>
             <p id="capacidadConsumidaResultado" style="display: none;">Capacidad Consumida: <span id="capacidadConsumidaValor">0</span> A/h</p>
         </div>
-    </div>
-    <div id="capacidadConsumida">
-        <table id="resultados" style="display: none;">
-            <thead>
-                <tr>
-                    <th>Tiempo</th>
-                    <th>Capacidad Restante (A/h)</th>
-                    <th>Corriente (A)</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+        
+        <div id="capacidadConsumida">
+            <table id="resultados" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>Tiempo</th>
+                        <th>Capacidad Restante (A/h)</th>
+                        <th>Corriente (A)</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
     </div>
     <script>
         let intervaloContador;
