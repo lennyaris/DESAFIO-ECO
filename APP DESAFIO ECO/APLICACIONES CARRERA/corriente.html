@@ -41,7 +41,7 @@
         #comenzarBtn button, #btnDetener {
             background-color: #007BFF;
             color: #fff;
-            padding: 10px 20px;
+            padding: 20px 20px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
@@ -54,6 +54,12 @@
         #comenzarBtn button:disabled, #btnDetener:disabled {
             background-color: #ccc;
             cursor: not-allowed;
+            margin: 7%;
+            margin-top: 40px;
+        }
+
+        #comenzarBtn {
+            text-align: center;
         }
 
         #capacidadConsumidaResultado {
@@ -73,8 +79,8 @@
             border-radius: 5px;
             padding: 10px;
             text-align: center;
-            margin-bottom: 10px;
-            background-color: #727272;
+            margin-bottom: 20px;
+            background-color: #ffffff;
         }
 
         #resultado {
@@ -125,7 +131,7 @@
 <body>
     <div id="container">
         <div id="tiempo">
-            <input type="time" id="tiempoInput" required>
+            <input type="number" id="tiempoInput" min="0" placeholder="tiempo (hh.mm)" required>
         </div>
         <div id="capacidadTotal">
             <input type="number" id="capacidadTotalInput" placeholder="capacidad total (A/h)" required>
@@ -163,74 +169,81 @@
         let contadorIniciado = false;
 
         function iniciarContador() {
-            if (contadorIniciado) return;
+    if (contadorIniciado) return;
 
-            const tiempoInput = document.getElementById("tiempoInput");
-            const capacidadTotalInput = document.getElementById("capacidadTotalInput");
-            const tiempoValor = tiempoInput.value;
-            const capacidadTotalValor = capacidadTotalInput.value;
+    const tiempoInput = document.getElementById("tiempoInput");
+    const tiempoFormatoDecimal = tiempoInput.value;
 
-            const partesTiempo = tiempoValor.split(":");
-            const horas = parseInt(partesTiempo[0]);
-            const minutos = parseInt(partesTiempo[1]);
-            const tiempoEnSegundos = (horas * 3600) + (minutos * 60);
+    if (tiempoFormatoDecimal) {
+        const tiempoEnSegundos = convertirTiempoASeconds(tiempoFormatoDecimal);
 
-            if (tiempoEnSegundos > 0 && capacidadTotalValor !== "") {
-                let tiempoRestante = tiempoEnSegundos;
-
-                const contadorElement = document.getElementById("contador");
-                contadorElement.textContent = formatTiempo(tiempoRestante);
-
-                intervaloContador = setInterval(function() {
-                    tiempoRestante--;
-                    contadorElement.textContent = formatTiempo(tiempoRestante);
-
-                    if (tiempoRestante <= 0) {
-                        detenerContador();
-                        contadorElement.textContent = "Tiempo agotado";
-                    }
-                }, 1000);
-
-                // Iniciar el intervalo de cálculo cada 2 segundos
-                intervaloCalculo = setInterval(calcularResultado, 2000);
-
-                // Deshabilitar los input de capacidad total y tiempo
-                tiempoInput.disabled = true;
-                capacidadTotalInput.disabled = true;
-                document.getElementById("btnIniciar").disabled = true;
-                document.getElementById("btnDetener").disabled = false;
-
-                // Mostrar el contador y el resultado
-                contadorElement.style.display = "block";
-                document.getElementById("resultado").style.display = "block";
-
-                contadorIniciado = true;
-            }
-        }
-
-        function detenerContador() {
-            clearInterval(intervaloContador);
-            clearInterval(intervaloCalculo);
-
-            // Limpiar el contenido de la tabla de resultados
+        if (tiempoEnSegundos > 0) {
+            // Restablecer la tabla de resultados
             const tablaResultados = document.getElementById("resultados");
-            tablaResultados.innerHTML = "";
-
-            // Restaurar la visibilidad de la tabla
             tablaResultados.style.display = "none";
+            tablaResultados.querySelector("tbody").innerHTML = "";
 
-            // Habilitar los input de capacidad total y tiempo
-            document.getElementById("tiempoInput").disabled = false;
-            document.getElementById("capacidadTotalInput").disabled = false;
-            document.getElementById("btnIniciar").disabled = false;
-            document.getElementById("btnDetener").disabled = true;
+            let tiempoRestante = tiempoEnSegundos;
+            const contadorElement = document.getElementById("contador");
 
-            // Ocultar el contador y el resultado
-            document.getElementById("contador").style.display = "none";
-            document.getElementById("resultado").style.display = "none";
+            intervaloContador = setInterval(function () {
+                if (tiempoRestante <= 0) {
+                    clearInterval(intervaloContador); // Detener el contador si llega a cero
+                    contadorElement.textContent = "00:00:00";
+                    return; // Salir de la función
+                } else {
+                    contadorElement.textContent = formatTiempo(tiempoRestante);
+                    tiempoRestante--;
+                }
+            }, 1000);
 
-            contadorIniciado = false;
+            // Iniciar el intervalo de cálculo cada 2 segundos
+            intervaloCalculo = setInterval(calcularResultado, 2000);
+
+            // Deshabilitar los input de capacidad total y tiempo
+            tiempoInput.disabled = true;
+            capacidadTotalInput.disabled = true;
+            document.getElementById("btnIniciar").disabled = true;
+            document.getElementById("btnDetener").disabled = false;
+
+            // Mostrar el contador y el resultado
+            contadorElement.style.display = "block";
+            document.getElementById("resultado").style.display = "block";
+
+            contadorIniciado = true;
         }
+    }
+}
+
+function detenerContador() {
+    clearInterval(intervaloContador);
+    clearInterval(intervaloCalculo);
+
+    // Restablecer el contador a 0
+    const contadorElement = document.getElementById("contador");
+    contadorElement.textContent = "0:00:00";
+
+    // Limpiar el contenido de la tabla de resultados
+    reiniciarTablaResultados();
+
+    // Restaurar la visibilidad de la tabla
+    const tablaResultados = document.getElementById("resultados");
+    tablaResultados.style.display = "none";
+
+    // Restablecer la habilitación de los inputs y botones
+    document.getElementById("tiempoInput").disabled = false;
+    document.getElementById("capacidadTotalInput").disabled = false;
+    document.getElementById("btnIniciar").disabled = false;
+    document.getElementById("btnDetener").disabled = true;
+
+    contadorIniciado = false;
+}
+
+function reiniciarTablaResultados() {
+    const tablaResultados = document.getElementById("resultados");
+    const tbody = tablaResultados.querySelector("tbody");
+    tbody.innerHTML = ""; // Limpiar el contenido de la tabla
+}
 
         function formatTiempo(segundos) {
             const horas = Math.floor(segundos / 3600);
@@ -307,35 +320,72 @@
         }
 
         function calcularCorrienteYAgregarFila() {
-    const capacidadRestanteInput = document.getElementById("capacidadRestanteInput");
-    const capacidadRestanteValor = parseFloat(capacidadRestanteInput.value);
+            const capacidadRestanteInput = document.getElementById("capacidadRestanteInput");
+            const capacidadRestanteValor = parseFloat(capacidadRestanteInput.value);
 
-    if (!isNaN(capacidadRestanteValor) && capacidadRestanteValor >= 0) {
-        const contadorElement = document.getElementById("contador");
-        const tiempoActual = contadorElement.textContent;
+            if (!isNaN(capacidadRestanteValor) && capacidadRestanteValor >= 0) {
+                const contadorElement = document.getElementById("contador");
+                const tiempoActual = contadorElement.textContent;
 
-        // Convertir el tiempo en formato "horas:minutes:segundos" a horas decimales
-        const tiempoParts = tiempoActual.split(':');
-        const horas = parseInt(tiempoParts[0]);
-        const minutos = parseInt(tiempoParts[1]);
-        const segundos = parseInt(tiempoParts[2]);
-        const tiempoEnHoras = horas + (minutos / 60) + (segundos / 3600);
+                // Convertir el tiempo en formato "horas:minutes:segundos" a horas decimales
+                const tiempoParts = tiempoActual.split(':');
+                const horas = parseInt(tiempoParts[0]);
+                const minutos = parseInt(tiempoParts[1]);
+                const segundos = parseInt(tiempoParts[2]);
+                const tiempoEnHoras = horas + (minutos / 60) + (segundos / 3600);
 
-        const resultado = capacidadRestanteValor / tiempoEnHoras;
+                const resultado = capacidadRestanteValor / tiempoEnHoras;
 
-        // Agregar una fila a la tabla de resultados
-        const tablaResultados = document.getElementById("resultados");
-        const fila = tablaResultados.insertRow(-1);
-        const tiempoCelda = fila.insertCell(0);
-        tiempoCelda.textContent = tiempoActual;
-        const capacidadRestanteCelda = fila.insertCell(1);
-        capacidadRestanteCelda.textContent = capacidadRestanteValor;
-        const corrienteCelda = fila.insertCell(2);
-        corrienteCelda.textContent = resultado.toFixed(3);
+                // Obtener la tabla de resultados
+                const tablaResultados = document.getElementById("resultados");
+                const tbody = tablaResultados.querySelector("tbody");
 
-        tablaResultados.style.display = "block";
+                // Insertar una nueva fila en el cuerpo de la tabla
+                const fila = tbody.insertRow(0);
+                const tiempoCelda = fila.insertCell(0);
+                tiempoCelda.textContent = tiempoActual;
+                const capacidadRestanteCelda = fila.insertCell(1);
+                capacidadRestanteCelda.textContent = capacidadRestanteValor;
+                const corrienteCelda = fila.insertCell(2);
+                corrienteCelda.textContent = resultado.toFixed(3);
+
+                // Mostrar la tabla si no está visible
+                tablaResultados.style.display = "block";
+            }
+        }
+// Obtener el input de tiempo
+const tiempoInput = document.getElementById("tiempoInput");
+
+// Agregar un evento oninput para limitar el valor después del punto a 59
+tiempoInput.addEventListener("input", function () {
+    const tiempoValor = tiempoInput.value;
+    const partes = tiempoValor.split('.');
+    
+    let horas = 0;
+    let minutos = 0;
+    
+    if (partes.length > 0) {
+        horas = parseInt(partes[0]) || 0;
     }
-}
+    
+    if (partes.length > 1) {
+        const minutosIngresados = parseInt(partes[1]) || 0;
+        minutos = Math.min(minutosIngresados, 59);
+    }
+    
+    tiempoInput.value = `${horas}.${minutos.toString().padStart(2, '0')}`;
+});
+
+function convertirTiempoASeconds(tiempoFormatoDecimal) {
+            const partes = tiempoFormatoDecimal.split('.');
+            if (partes.length === 2) {
+                const horas = parseInt(partes[0]);
+                const minutosDecimales = parseFloat("0." + partes[1]);
+                const minutos = Math.floor(minutosDecimales * 100);
+                return horas * 3600 + minutos * 60;
+            }
+            return 0; // Formato incorrecto
+        }
     </script>
 </body>
 </html>
